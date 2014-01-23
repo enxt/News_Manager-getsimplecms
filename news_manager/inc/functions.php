@@ -23,6 +23,27 @@ function nm_get_posts($all=false) {
   return $posts;
 }
 
+function nm_get_comments_summary($slug) {
+    if(!file_exists(NMPOSTCOMMENTSCACHE.$slug.'._summary.xml'))
+        nm_update_comments_cache($slug);
+
+    $data = @getXML(NMPOSTCOMMENTSCACHE.$slug.'_summary.xml');
+    if(empty($data)) $data = new SimpleXMLExtended('<?xml version="1.0" encoding="UTF-8"?><channel><item><total><![CDATA[0]]></total><readed><![CDATA[0]]></readed><approved><![CDATA[0]]></approved></item></channel>');
+    return $data;
+}
+
+function nm_get_comments($slug, $all=false) {
+  if(!file_exists(NMPOSTCOMMENTSCACHE.$slug.'.xml'))
+    nm_update_comments_cache($slug);
+  $data = @getXML(NMPOSTCOMMENTSCACHE.$slug.'.xml');
+  /*$now = time();
+  $comments = array();
+  foreach($data->comments as $comment) {
+    $comments[] = $comment;
+  }*/
+  return $data;
+}
+
 
 /*******************************************************
  * @function nm_get_archives
@@ -338,11 +359,14 @@ function nm_sitemap_include() {
  * @action insert necessary script/style sections into site header
  */
 function nm_header_include() {
-  if (isset($_GET['id']) && $_GET['id'] == 'news_manager' && isset($_GET['edit'])) {
+  global $SITEURL;
+  if (isset($_GET['id']) && $_GET['id'] == 'news_manager' && (isset($_GET['edit']) || (isset($_GET['slug']) && isset($_GET['tgglread'])) || (isset($_GET['slug']) && isset($_GET['tgglappr'])) || (isset($_GET['slug']) && isset($_GET['cmdelete'])))) {
+  //if (isset($_GET['id']) && $_GET['id'] == 'news_manager' && isset($_GET['edit'])) {
     if (!function_exists('register_script')) {
       // for GetSimple 3.0
       echo '<script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"></script>';
     }
+    echo '<link href="' . $SITEURL . '/plugins/news_manager/template/style.css" rel="stylesheet">';
   ?>
   <style>
     .invalid {

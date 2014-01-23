@@ -31,6 +31,18 @@ require_once('news_manager/inc/common.php');
 # language
 i18n_merge('news_manager') || i18n_merge('news_manager', 'en_US');
 
+if(isAjax()) {
+    if (nm_env_check()) {
+        if (isset($_GET['tgglread']) && isset($_GET['slug'])) {
+            nm_toggle_read_comment($_GET['slug'], $_GET['tgglread']);
+        }
+        if (isset($_GET['tgglappr']) && isset($_GET['slug'])) {
+            nm_toggle_approved_comment($_GET['slug'], $_GET['tgglappr']);
+        }
+    }
+    exit;
+}
+else {
 # hooks
 add_action('pages-sidebar', 'createSideMenu', array($thisfile, i18n_r('news_manager/PLUGIN_NAME')));
 add_action('header', 'nm_header_include');
@@ -52,6 +64,8 @@ if (function_exists('register_script')) {
     queue_script('jquery-validate', GSBACK);
   }
 }
+}
+
 
 /*******************************************************
  * @function nm_admin
@@ -62,12 +76,23 @@ function nm_admin() {
     # post management
     if (isset($_GET['edit'])) {
         nm_edit_post($_GET['edit']);
+	} elseif (isset($_GET['comment'])) {
+		nm_edit_comments($_GET['comment']);
     } elseif (isset($_POST['post'])) {
         nm_save_post();
         nm_admin_panel();
     } elseif (isset($_GET['delete'])) {
         nm_delete_post($_GET['delete']);
         nm_admin_panel();
+    } elseif (isset($_GET['cmdelete']) && isset($_GET['slug'])) {
+        nm_delete_comment($_GET['slug'], $_GET['cmdelete']);
+        nm_edit_post($_GET['slug']);
+    /*} elseif (isset($_GET['tgglread']) && isset($_GET['slug'])) {
+        nm_toggle_read_comment($_GET['slug'], $_GET['tgglread']);
+        //nm_edit_post($_GET['slug']);
+    } elseif (isset($_GET['tgglappr']) && isset($_GET['slug'])) {
+        nm_toggle_approved_comment($_GET['slug'], $_GET['tgglappr']);
+        //nm_edit_post($_GET['slug']);*/
     } elseif (isset($_GET['restore'])) {
         nm_restore_post($_GET['restore']);
         nm_admin_panel();
@@ -122,6 +147,10 @@ function nm_frontend_init() {
     ob_end_clean();
     $content = addslashes(htmlspecialchars($content, ENT_QUOTES, 'UTF-8'));
   }
+}
+
+function isAjax() {
+    return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'));
 }
 
 /*******************************************************

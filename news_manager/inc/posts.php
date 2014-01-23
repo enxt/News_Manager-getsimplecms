@@ -31,6 +31,17 @@ function nm_edit_post($slug) {
     echo '<small>',i18n_r('news_manager/LAST_SAVED'),': ',$mtime,'</small>';
   }
   include(NMTEMPLATEPATH . 'ckeditor.php');
+  
+  $cmdir = NMPOSTPATH . $slug . '/';
+  //if(dirname(realpath($cmfile)) == realpath(NMPOSTCOMMENTSPATH)) {
+  if(is_dir($cmdir)) {
+        $comments = getFiles($cmdir);
+        if(!empty($comments) && !(count($comments) == 1 && $comments[0] == '.htaccess')) {
+            //$cmdata = @getXML($cmfile);
+            echo '<br /><br /><br /><br />';
+            include(NMTEMPLATEPATH . 'edit_comments.php');
+        }
+  }
 }
 
 

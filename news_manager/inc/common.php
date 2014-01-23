@@ -13,6 +13,7 @@ define('NMINCPATH', GSPLUGINPATH . 'news_manager/inc/');
 define('NMLANGPATH', GSPLUGINPATH . 'news_manager/lang/');
 define('NMTEMPLATEPATH', GSPLUGINPATH . 'news_manager/template/');
 
+define('NMPOSTCOMMENTSCACHE', NMDATAPATH . 'comments/');
 
 # file definitions
 define('NMSETTINGS', NMDATAPATH . 'settings.xml');
@@ -25,6 +26,7 @@ require_once(NMINCPATH . 'settings.php');
 require_once(NMINCPATH . 'cache.php');
 require_once(NMINCPATH . 'admin.php');
 require_once(NMINCPATH . 'posts.php');
+require_once(NMINCPATH . 'comments.php');
 require_once(NMINCPATH . 'site.php');
 require_once(NMINCPATH . 'sidebar.php');
 

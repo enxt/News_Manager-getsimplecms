@@ -1,0 +1,27 @@
+.unreaded {
+    font-size: 0.8em;
+    padding: 3px 6px;
+    border-radius: 3px;
+    background-color: darkred;
+}
+
+.readed {
+    font-size: 0.8em;
+    padding: 3px 6px;
+    border-radius: 3px;
+    background-color: darkgreen;
+}
+
+.unapproved {
+    font-size: 0.8em;
+    padding: 3px 6px;
+    border-radius: 3px;
+    background-color: darkred;
+}
+
+.approved {
+    font-size: 0.8em;
+    padding: 3px 6px;
+    border-radius: 3px;
+    background-color: darkgreen;
+}

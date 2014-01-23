@@ -104,6 +104,7 @@ function nm_show_search_results() {
 function nm_show_single($slug) {
   nm_set_pagetype_options('single');
   nm_show_post($slug, false, true);
+  nm_show_comments($slug);
 }
 
 
@@ -253,6 +254,7 @@ function nm_show_post($slug, $showexcerpt=false, $single=false) {
     $date    = nm_get_date(i18n_r('news_manager/DATE_FORMAT'), strtotime($post->date));
     $content = strip_decode($post->content);
     $image   = stripslashes($post->image);
+    $comments = nm_get_comments_summary($slug);
 
     # save post data?
     $nmdata = ($single) ? compact('slug', 'url', 'title', 'content', 'image') : array();
@@ -349,6 +351,13 @@ function nm_show_post($slug, $showexcerpt=false, $single=false) {
       }
     }
 
+    if(!empty($comments) && !$single) {
+        $sum_comments = $comments->item;
+        if(isset($sum_comments->approved) && !empty($sum_comments->approved) && $sum_comments->approved > 0) {
+           echo '   <p class="nm_post_sum_comments">' . $sum_comments->approved . ' Comments</p>';
+        }
+    }
+
     echo '  </',$nmoption['markuppost'],'>',PHP_EOL;
 
     if (isset($nmoption['componentafterpost'])) {
@@ -408,6 +417,78 @@ function nm_post_title($before='', $after='', $echo=true) {
   } else {
     return false;
   }
+}
+
+function nm_show_comments($slug) {
+  global $nmoption, $nmdata;
+  //$file = NMPOSTCOMMENTSPATH.$slug.'.xml';
+  $url = nm_get_url('post') . $slug;
+
+  if(!empty($_POST) && isset($_POST['comment']) && trim($_POST['comment'] !== '')) {
+	nm_save_comment($slug);
+  }
+
+  ?>
+  <div id="comments">
+  <?php
+	//if (dirname(realpath($file)) == realpath(NMPOSTCOMMENTSPATH)) // no path traversal
+    //$comments = @getXML($file);
+    $comments = nm_get_comments($slug);
+    $sum_comments = nm_get_comments_summary($slug);
+    $sum_comments = $sum_comments->item;
+	
+	if(!empty($comments) && $sum_comments->approved > 0) { ?>
+	<h4><?php echo $sum_comments->approved . ' Comments'; ?></h4>
+	<?php
+	  foreach($comments as $comment) {
+          if($comment->approved == 'true') { ?>
+		<div class="comment">
+		  <p class="comment_header">
+		    From: <?php echo (!empty($comment->link))?'<a href="'.$comment->link.'">'.$comment->username.'</a>':$comment->username; ?>
+			<br />
+			<span class="comment_date"><?php echo $comment->date; ?></span>
+		  </p>
+		  <p>
+		    <?php echo $comment->message; ?>
+			<br />
+		  </p>		
+		</div>
+	  <?php
+          }
+	  }
+	}
+  ?>
+    <h4>Post a comment</h4>
+    <p style="font-style: italic">
+      All comments are held for moderation; basic HTML formatting accepted.
+    </p>
+    <form id="commentform" method="POST" action="<?php echo $url; ?>">
+      <input type="hidden" name="post_id" value="<?php echo $slug; ?>" />
+      <input type="hidden" name="return_url" value="<?php echo $url; ?>" />
+      <table>
+        <tr style="text-align: left;">
+          <th style="padding-bottom: 5px;">Name: </th>
+          <td><input type="text" size="25" name="username" /> (required)</td>
+        </tr>
+        <tr>
+          <tr style="text-align: left;">
+          <th style="padding-bottom: 5px;">E-mail: </th>
+          <td><input type="text" size="25" name="email" /> (required, not published)</td>
+        </tr>
+          <tr style="text-align: left;">
+          <th style="padding-bottom: 5px;">Website: </th>
+          <td><input type="text" size="25" name="link" /> (optional)</td>
+        </tr>
+        <tr>
+          <td style="padding-bottom: 5px;" colspan="2"><textarea name="comment" rows="10" cols="60" ></textarea></td>
+        </tr>
+        <tr>
+          <td style="padding-bottom: 5px;"><input type="submit" name="submit" value="Submit Comment" /></td>
+        </tr>
+      </table>
+    </form>
+  </div>
+  <?php
 }
 
 

@@ -32,6 +32,7 @@ function nm_admin_panel() {
     <table id="posts" class="highlight">
     <tr>
       <th><?php i18n('news_manager/POST_TITLE'); ?></th>
+	  <th>COMMENTS</th>
       <th style="text-align: right;"><?php i18n('news_manager/DATE'); ?></th>
       <th></th>
       <th></th>
@@ -42,6 +43,8 @@ function nm_admin_panel() {
       $title = stripslashes($post->title);
       $date = shtDate($post->date);
       $url = nm_get_url('post') . $post->slug;
+	  $comments = nm_get_comments_summary($post->slug);
+      $comments = $comments->item;
       ?>
       <tr>
         <td class="posttitle">
@@ -49,6 +52,11 @@ function nm_admin_panel() {
             <?php echo $title; ?>
           </a>
         </td>
+		<td style="width: 20px;text-align: center;">
+			<span style="<?php echo (intval($comments->readed) < intval($comments->total))?'color: white;background-color: darkred;padding: 3px 5px;border-radius: 4px;text-shadow: none;':''; ?>">
+				<?php echo $comments->total; ?>
+			</span>
+		</td>
         <td style="text-align: right;">
           <?php 
             if (strtotime($post->date) > time())

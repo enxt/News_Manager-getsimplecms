@@ -11,6 +11,7 @@
  */
 function nm_env_check() {
   $env_ok = file_exists(NMPOSTPATH) || nm_create_dir(NMPOSTPATH);
+  $env_ok = file_exists(NMPOSTCOMMENTSCACHE) || nm_create_dir(NMPOSTCOMMENTSCACHE);
   if ($env_ok && !file_exists(NMBACKUPPATH))
     $env_ok = nm_create_dir(NMBACKUPPATH);
   if ($env_ok && !file_exists(NMDATAPATH)) {
